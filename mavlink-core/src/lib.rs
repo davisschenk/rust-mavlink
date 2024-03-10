@@ -425,7 +425,7 @@ const MAVLINK_IFLAG_SIGNED: u8 = 0x01;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 // Follow protocol definition: `<https://mavlink.io/en/guide/serialization.html#mavlink2_packet_format>`
-pub struct MAVLinkV2MessageRaw([u8; 1 + Self::HEADER_SIZE + 255 + 2 + Self::SIGNATURE_SIZE]);
+pub struct MAVLinkV2MessageRaw(pub [u8; 1 + Self::HEADER_SIZE + 255 + 2 + Self::SIGNATURE_SIZE]);
 
 impl Default for MAVLinkV2MessageRaw {
     fn default() -> Self {
@@ -447,7 +447,7 @@ impl MAVLinkV2MessageRaw {
     }
 
     #[inline]
-    fn mut_header(&mut self) -> &mut [u8] {
+    pub fn mut_header(&mut self) -> &mut [u8] {
         &mut self.0[1..=Self::HEADER_SIZE]
     }
 
@@ -501,7 +501,7 @@ impl MAVLinkV2MessageRaw {
         ])
     }
 
-    fn mut_payload_and_checksum_and_sign(&mut self) -> &mut [u8] {
+    pub fn mut_payload_and_checksum_and_sign(&mut self) -> &mut [u8] {
         let payload_length: usize = self.payload_length().into();
 
         // Signature to ensure the link is tamper-proof.
@@ -537,7 +537,7 @@ impl MAVLinkV2MessageRaw {
         &self.0[..(1 + Self::HEADER_SIZE + payload_length + signature_size + 2)]
     }
 
-    fn serialize_stx_and_header_and_crc(
+    pub fn serialize_stx_and_header_and_crc(
         &mut self,
         header: MavHeader,
         msgid: u32,
